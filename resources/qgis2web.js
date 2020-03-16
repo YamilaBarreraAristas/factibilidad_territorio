@@ -1,30 +1,4 @@
 
-isTracking = false;
-geolocateControl = function(opt_options) {
-    var options = opt_options || {};
-    var button = document.createElement('button');
-    button.className += ' fa fa-map-marker';
-    var handleGeolocate = function() {
-        if (isTracking) {
-            map.removeLayer(geolocateOverlay);
-            isTracking = false;
-      } else if (geolocation.getTracking()) {
-            map.addLayer(geolocateOverlay);
-            map.getView().setCenter(geolocation.getPosition());
-            isTracking = true;
-      }
-    };
-    button.addEventListener('click', handleGeolocate, false);
-    button.addEventListener('touchstart', handleGeolocate, false);
-    var element = document.createElement('div');
-    element.className = 'geolocate ol-unselectable ol-control';
-    element.appendChild(button);
-    ol.control.Control.call(this, {
-        element: element,
-        target: options.target
-    });
-};
-ol.inherits(geolocateControl, ol.control.Control);
 
 var measuring = false;
 measureControl = function(opt_options) {
@@ -83,7 +57,7 @@ var expandedAttribution = new ol.control.Attribution({
 
 var map = new ol.Map({
     controls: ol.control.defaults({attribution:false}).extend([
-        expandedAttribution,new ol.control.ScaleLine({}),new measureControl(),new geolocateControl()
+        expandedAttribution,new ol.control.ScaleLine({}),new measureControl()
     ]),
     target: document.getElementById('map'),
     renderer: 'canvas',
@@ -100,7 +74,7 @@ layerSwitcher.hidePanel = function() {};
 layerSwitcher.showPanel();
 
 
-map.getView().fit([-6507976.473038, -4131361.062597, -6488781.504270, -4117297.867121], map.getSize());
+map.getView().fit([-6510147.369095, -4130516.223975, -6488022.885227, -4116407.964120], map.getSize());
 
 var NO_POPUP = 0
 var ALL_FIELDS = 1
@@ -140,7 +114,7 @@ var featureOverlay = new ol.layer.Vector({
     updateWhileInteracting: true // optional, for instant visual feedback
 });
 
-var doHighlight = true;
+var doHighlight = false;
 var doHover = false;
 
 var highlight;
@@ -628,44 +602,6 @@ var formatLength = function(line) {
 
 addInteraction();
 
-
-      var geolocation = new ol.Geolocation({
-  projection: map.getView().getProjection()
-});
-
-
-var accuracyFeature = new ol.Feature();
-geolocation.on('change:accuracyGeometry', function() {
-  accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
-});
-
-var positionFeature = new ol.Feature();
-positionFeature.setStyle(new ol.style.Style({
-  image: new ol.style.Circle({
-    radius: 6,
-    fill: new ol.style.Fill({
-      color: '#3399CC'
-    }),
-    stroke: new ol.style.Stroke({
-      color: '#fff',
-      width: 2
-    })
-  })
-}));
-
-geolocation.on('change:position', function() {
-  var coordinates = geolocation.getPosition();
-  positionFeature.setGeometry(coordinates ?
-      new ol.geom.Point(coordinates) : null);
-});
-
-var geolocateOverlay = new ol.layer.Vector({
-  source: new ol.source.Vector({
-    features: [accuracyFeature, positionFeature]
-  })
-});
-
-geolocation.setTracking(true);
 
 
 var geocoder = new Geocoder('nominatim', {
